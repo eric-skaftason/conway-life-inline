@@ -1,0 +1,147 @@
+<body>
+    <h1></h1>
+
+    <div class="board"></div>
+    <div class="controls">
+        <button id="play">Play</button>
+        <button id="pause">Pause</button>
+    </div>
+
+    <style>
+        body { background: black; color: white; font-family: sans-serif; }
+
+        .board {
+            display: inline-block;
+        }
+
+        .row {
+            display: inline-block;
+        }
+
+        .cell {
+            width: 20px;
+            height: 20px;
+
+            background-color: grey
+        }
+
+        .alive {
+            background-color: green;
+        }
+    </style>
+    <script>
+        // States
+        let isRunning = false;
+
+        const ROWS = 20, COLS = 20;
+
+        // 0 - off, 1 - on
+        const matrix = Array.from({length: ROWS * COLS}, () => ({current: 0, next: null}));
+
+        // Board Setup
+        const board = document.querySelector('.board');
+        for (let i = 0; i < ROWS; i++) {
+            const row = document.createElement('div');
+            row.classList.add('row');
+            for (let j = 0; j < COLS; j++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+
+                cell.addEventListener('click', () => {
+                    if (cell.classList.contains('alive')) {
+                        cell.classList.remove('alive');
+                        matrix[i * COLS + j].current = 0;
+                    } else {
+                        cell.classList.add('alive');
+                        matrix[i * COLS + j].current = 1;
+                    }
+                });
+
+                row.append(cell);
+            }
+            board.append(row);
+        }
+
+        const cells = document.querySelectorAll('.cell');
+
+        document.querySelector('#play').addEventListener('click', () => {
+            if (!isRunning) run();
+        });
+
+        /*
+            RULES:
+
+            Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+            Any live cell with two or three live neighbours lives on to the next generation.
+            Any live cell with more than three live neighbours dies, as if by overpopulation.
+            Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+        */
+
+        function indexToRowCol(index) {
+            const row = Math.floor(index / COLS);
+            const col = index % COLS;
+
+            return {row: row, col: col};
+        }
+
+        function numNeighbours(index) {
+            const {row, col} = indexToRowCol(index);
+
+            const min_row = Math.max(row - 1, 0);
+            const max_row = Math.min(row + 1, ROWS - 1);
+
+            const min_col = Math.max(col - 1, 0);
+            const max_col = Math.min(col + 1, COLS - 1);
+
+            let neighbours = 0; // note: self will be included in this computation, account for later by subtracting 1
+            for (let r = min_row; r <= max_row; r++) {
+                for (let c = min_col; c <= max_col; c++) {
+
+                    if (matrix[r * COLS + c].current) neighbours++;
+                }    
+            }
+
+            return neighbours - matrix[index].current;
+        }
+
+        function run() {
+            isRunning = true;
+
+            for (let i = 0; i < ROWS * COLS; i++) {
+
+                const neighbours = numNeighbours(i);
+
+                if (matrix[i].current) {
+                    // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+                    if (neighbours < 2) matrix[i].next = 0;
+
+                    // Any live cell with two or three live neighbours lives on to the next generation.
+                    // default case
+
+                    // Any live cell with more than three live neighbours dies, as if by overpopulation.
+                    if (neighbours > 3) matrix[i].next = 0;
+                }
+                
+                // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction
+                if (!matrix[i].next && neighbours === 3) matrix[i].next = 1;
+
+            }
+
+
+            // Apply changes
+            for (let i = 0; i < ROWS * COLS; i++) {
+                if (matrix[i].next !== null) matrix[i].current = matrix[i].next;
+                matrix[i].next = null;
+
+                if (matrix[i].current) cells[i].classList.add('alive'); else cells[i].classList.remove('alive');
+            }
+
+            setTimeout(() => {
+                run();
+            }, 500);
+
+        }
+
+
+    </script>
+</body>
