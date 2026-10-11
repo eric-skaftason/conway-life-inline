@@ -1,0 +1,1 @@
+An implementation of Conway's Game of Life.  It includes play/pause functionality as well as 5 speed settings.
