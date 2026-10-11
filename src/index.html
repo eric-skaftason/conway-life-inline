@@ -1,5 +1,5 @@
 <body>
-    <h1></h1>
+    <h1>Conway's Game of Life</h1>
 
     <div class="demo_container">
         <div class="board"></div>
@@ -10,15 +10,19 @@
     </div>
 
     <style>
+        h1 {
+            text-align: center;
+        }
+
         body {
             background: black; color: white; font-family: sans-serif;
-            width: 800px;
+            width: 750px;
         }
 
         .board {
             display: grid;
-            grid-template-rows: repeat(40, 20px);
-            grid-template-columns: repeat(40, 20px);
+            grid-template-rows: repeat(50, 15px);
+            grid-template-columns: repeat(50, 15px);
         }
 
         .row {
@@ -74,7 +78,7 @@
 
         let speed = SPEEDS[2];
 
-        const ROWS = 40, COLS = 40;
+        const ROWS = 50, COLS = 50;
 
         // 0 - off, 1 - on
         const matrix = Array.from({length: ROWS * COLS}, () => ({current: 0, next: null}));
