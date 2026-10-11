@@ -5,20 +5,20 @@
         <div class="board"></div>
         <div class="controls">
             <button id="play">Play</button>
-            <button id="speed">Normal Speed</button>
+            <button id="speed">NORMAL</button>
         </div>
     </div>
 
     <style>
         body {
             background: black; color: white; font-family: sans-serif;
-            width: 400px;
+            width: 800px;
         }
 
         .board {
             display: grid;
-            grid-template-rows: repeat(20, 20px);
-            grid-template-columns: repeat(20, 20px);
+            grid-template-rows: repeat(40, 20px);
+            grid-template-columns: repeat(40, 20px);
         }
 
         .row {
@@ -27,6 +27,7 @@
 
         .cell {
             background-color: grey;
+            outline: 1px solid black;
         }
 
         .alive {
@@ -63,7 +64,17 @@
         // States
         let isRunning = false;
 
-        const ROWS = 20, COLS = 20;
+        const SPEEDS = [
+            ["VSLOW", 800],    
+            ["SLOW", 500],
+            ["NORMAL", 250],
+            ["FAST", 100],
+            ["VFAST", 50]
+        ];
+
+        let speed = SPEEDS[2];
+
+        const ROWS = 40, COLS = 40;
 
         // 0 - off, 1 - on
         const matrix = Array.from({length: ROWS * COLS}, () => ({current: 0, next: null}));
@@ -100,7 +111,9 @@
         });
 
         document.querySelector('#speed').addEventListener('click', () => {
-            
+            speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length];
+
+            document.querySelector('#speed').innerText = speed[0];
         });
 
         /*
@@ -173,7 +186,7 @@
 
             setTimeout(() => {
                 if (isRunning) run();
-            }, 500);
+            }, speed[1]);
 
         }
 
